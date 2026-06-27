@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vira</title>
+    
+    <!-- تحميل أيقونات فونت أوسم الاحترافية -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+      
+        // إعدادات مشروعك
+        const firebaseConfig = {
+          apiKey: "AIzaSyAtjygm5UBSxyeYJuiIG2q_ZF3-teEfrvU",
+          authDomain: "vira-49daf.firebaseapp.com",
+          projectId: "vira-49daf",
+          storageBucket: "vira-49daf.appspot.com",
+          messagingSenderId: "994168830782",
+          appId: "1:994168830782:web:c72d22afe41eb07679ca6f"
+        };
+      
+        // تهيئة التطبيق
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+      
+        // اجعل db متاحاً لباقي دوال موقعك
+        window.db = db;
+      </script>
+    <style>
+        :root {
+            --primary: #000000;
+            --primary-gradient: linear-gradient(135deg, #000000, #333333);
+            --founder-gradient: linear-gradient(135deg, #111827, #1f2937, #374151);
+            --bg: #f4f6f9;
+            --card: #ffffff;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.09);
+            --danger: #ef4444;
+            --like: #0078d4;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        /* شاشة تسجيل الدخول */
+        .login-overlay {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #e2e8f0, #f1f5f9);
+        }
+
+        .login-glass-card {
+            background: var(--card);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid var(--border);
+            animation: cardPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes cardPop {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .login-glass-card h2 {
+            font-size: 42px;
+            font-weight: 900;
+            color: var(--primary);
+            margin: 0 0 10px 0;
+            letter-spacing: -1px;
+        }
+
+        .login-glass-card input {
+            width: 100%;
+            padding: 14px 20px;
+            margin: 10px 0;
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .login-glass-card input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(0,0,0,0.05);
+        }
+
+        /* خيار حفظ الحساب الاستراتيجي */
+        .remember-me-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 10px;
+            margin: 12px 5px;
+            font-size: 14px;
+            color: var(--text-muted);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .remember-me-container input {
+            width: auto;
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .main-workspace { display: none; }
+
+        .premium-navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--card);
+            padding: 18px 60px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-logo {
+            font-size: 26px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            color: var(--text);
+        }
+
+        .nav-right-side {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logout-btn {
+            background: #fff;
+            border: 1px solid var(--border);
+            color: var(--danger);
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .logout-btn:hover {
+            background: #fef2f2;
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .store-body {
+            max-width: 720px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .founder-panel-card {
+            display: none;
+            background: var(--founder-gradient);
+            color: white;
+            padding: 30px;
+            border-radius: 24px;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+
+        .founder-panel-card h3 {
+            margin: 0 0 15px 0;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .form-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .form-stack input {
+            width: 100%;
+            padding: 14px 20px;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            font-size: 15px;
+            outline: none;
+            box-sizing: border-box;
+            transition: all 0.3s;
+        }
+
+        .form-stack input:focus {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: white;
+        }
+
+        .preview-studio-zone {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+        }
+
+        .preview-studio-zone h4 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .founder-action-btn {
+            background-color: white;
+            color: black;
+            border: none;
+            padding: 14px;
+            border-radius: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .founder-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255,255,255,0.2);
+        }
+
+        .post-media-container {
+            margin-top: 15px;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #000;
+            max-height: 450px;
+            display: block;
+        }
+
+        .post-media-container img, .post-media-container video {
+            width: 100%;
+            height: auto;
+            max-height: 450px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .post-media-container iframe {
+            width: 100%;
+            height: 350px;
+            border: none;
+            display: block;
+        }
+
+        .premium-blog-card {
+            background-color: var(--card);
+            border-radius: 24px;
+            padding: 30px;
+            border: 1px solid var(--border);
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .premium-blog-card:hover { box-shadow: var(--shadow-hover); }
+
+        .delete-btn {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 16px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .delete-btn:hover { color: var(--danger); }
+
+        .blog-user-row { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .founder-avatar {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .blog-user-meta .b-name { font-weight: 800; font-size: 16px; }
+        .blog-user-meta .b-tag { font-size: 13px; color: var(--text-muted); }
+        .blog-text { font-size: 16px; line-height: 1.7; color: #1e293b; word-wrap: break-word; }
+
+        .blog-footer-actions {
+            display: flex;
+            gap: 12px;
+            border-top: 1px solid var(--border);
+            margin-top: 20px;
+            padding-top: 15px;
+        }
+
+        .interactive-action-btn {
+            background: #f1f5f9;
+            border: none;
+            color: var(--text-muted);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .interactive-action-btn:hover {
+            background: #e2e8f0;
+            color: var(--text);
+        }
+
+        .post-liked { background: var(--like) !important; }
+        .post-liked i { color: white !important; animation: iconPulse 0.3s ease; }
+        
+        .post-disliked { background: var(--danger) !important; }
+        .post-disliked i { color: white !important; animation: iconShake 0.3s ease; }
+
+        @keyframes iconPulse { 50% { transform: scale(1.3); } }
+        @keyframes iconShake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+
+        .comments-section {
+            margin-top: 25px;
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .comment-input-box { display: flex; gap: 10px; }
+        .comment-input-box input {
+            flex: 1; padding: 12px 18px; border: 1px solid var(--border); border-radius: 12px; outline: none; font-size: 14px;
+        }
+        .comment-input-box button {
+            background: var(--primary); color: white; border: none; padding: 0 22px; border-radius: 12px; font-weight: 700; cursor: pointer;
+        }
+
+        .comments-list { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+        .single-comment {
+            background: white; padding: 12px 18px; border-radius: 12px; border: 1px solid var(--border); font-size: 14px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .single-comment .c-user { font-weight: 800; color: #1e293b; }
+        .comment-delete-trigger { color: var(--text-muted); cursor: pointer; font-size: 14px; padding: 5px; }
+        .comment-delete-trigger:hover { color: var(--danger); }
+
+        .empty-placeholder { text-align: center; padding: 70px; color: var(--text-muted); font-weight: 600; font-size: 18px; }
+
+        .toast-notification {
+            position: fixed; bottom: -100px; right: 30px; background-color: #0f172a; color: white; padding: 16px 28px; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.15); font-weight: 600; display: flex; align-items: center; gap: 12px; transition: bottom 0.3s; z-index: 1000;
+        }
+        .toast-notification.show-toast { bottom: 30px; }
+    </style>
+</head>
+<body>
+
+    <!-- شاشة تسجيل الدخول المحدثة بزر حفظ الحساب -->
+    <div class="login-overlay" id="loginScreenView">
+        <div class="login-glass-card">
+            <h2>Vira</h2>
+            <p style="color: var(--text-muted); margin-bottom: 25px;">Welcome</p>
+            <input type="text" id="userIdentityField" autocomplete="off" placeholder="Username">
+            <input type="password" id="userPasswordField" autocomplete="off" placeholder="Secret Access Password">
+            
+            <!-- خانة تفعيل حفظ الحساب -->
+            <label class="remember-me-container">
+                <input type="checkbox" id="rememberMeCheckbox"> Remember account 
+            </label>
+
+            <button class="login-btn" onclick="authenticateUser()">Start</button>
+        </div>
+    </div>
+
+    <!-- فضاء العمل الرئيسي -->
+    <div class="main-workspace" id="mainWorkspaceArea">
+        <header class="premium-navbar">
+            <div class="nav-logo">Vira corporation 1.0</div>
+            <div class="nav-right-side">
+                <div id="badgePlacement"></div>
+                <button class="logout-btn" onclick="logOutUser()"><i class="fa-solid fa-right-from-bracket"></i> Exit</button>
+            </div>
+        </header>
+
+        <div class="store-body">
+            <div class="founder-panel-card" id="secretFounderConsole">
+                <h3><i class="fa-solid fa-photo-film"></i>Create a new post</h3>
+                <div class="form-stack">
+                    <input type="text" id="inputPostText" oninput="updateLivePreview()" placeholder="What is the text?">
+                    <input type="text" id="inputPostMedia" oninput="updateLivePreview()" placeholder="Paste Image Link or Video Link">
+                    
+                    <div class="preview-studio-zone">
+                        <h4>Preview</h4>
+                        <div id="previewTextOutput" style="font-size: 15px; opacity: 0.8; margin-bottom: 10px; font-style: italic;">[Empty]</div>
+                        <div id="previewMediaOutput"></div>
+                    </div>
+
+                    <button class="founder-action-btn" onclick="publishNewPostToFeed()"><i class="fa-solid fa-paper-plane"></i> Launching the post</button>
+                </div>
+            </div>
+
+            <div id="feedInjectContainer"></div>
+        </div>
+    </div>
+
+    <div class="toast-notification" id="globalToastNotification">
+        <i class="fa-solid fa-circle-check" style="color: #10b981; font-size: 20px;"></i>
+        <span id="toastMessageText">Processed</span>
+    </div>
+
+    <script>
+        let currentUser = "";
+        let isFounder = false;
+        let postsData = JSON.parse(localStorage.getItem('vira_corporate_posts')) || [];
+
+        // الفحص التلقائي الفوري فور فتح الصفحة لمعرفة إذا كان هناك حساب محفوظ
+        window.onload = function() { 
+            let savedSession = JSON.parse(localStorage.getItem('vira_saved_session'));
+            if(savedSession) {
+                currentUser = savedSession.username;
+                isFounder = savedSession.isFounder;
+                launchWorkspace();
+            }
+            renderPosts(); 
+        };
+
+        function authenticateUser() {
+            let username = document.getElementById('userIdentityField').value.trim();
+            let password = document.getElementById('userPasswordField').value.trim();
+            let rememberMe = document.getElementById('rememberMeCheckbox').checked;
+
+            if (username === "" || password === "") { 
+                alert("Please completely fill username and password fields."); 
+                return; 
+            }
+
+            // 1. فحص حساب المؤسس
+            if (password === "2012") {
+                currentUser = username + " (Founder)";
+                isFounder = true;
+                if(rememberMe) {
+                    localStorage.setItem('vira_saved_session', JSON.stringify({username: currentUser, isFounder: true}));
+                }
+                launchWorkspace();
+                triggerToast("Founder clearance granted.");
+                return;
+            }
+
+            // 2. فحص حساب مستخدم عادي
+            if (password === "2019") {
+                currentUser = username;
+                isFounder = false;
+                if(rememberMe) {
+                    localStorage.setItem('vira_saved_session', JSON.stringify({username: currentUser, isFounder: false}));
+                }
+                launchWorkspace();
+                triggerToast(`Connected securely as ${username}`);
+                return;
+            }
+
+            alert("Access Denied: Invalid Security Password Key.");
+        }
+
+        // دالة تشغيل وتحميل واجهة العمل بناء على الصلاحية
+        function launchWorkspace() {
+            document.getElementById('loginScreenView').style.display = 'none';
+            document.getElementById('mainWorkspaceArea').style.display = 'block';
+
+            if(isFounder) {
+                document.getElementById('secretFounderConsole').style.display = 'block';
+                document.getElementById('badgePlacement').innerHTML = `<span style="color: #000; background: #e2e8f0; padding: 8px 16px; border-radius: 12px; font-weight: 700;"><i class="fa-solid fa-crown"></i> Founder Panel</span>`;
+            } else {
+                document.getElementById('secretFounderConsole').style.display = 'none';
+                document.getElementById('badgePlacement').innerHTML = `<span style="color: #64748b; background: #f1f5f9; padding: 8px 16px; border-radius: 12px; font-weight: 700;"><i class="fa-solid fa-user"></i> Certified Terminal</span>`;
+            }
+            renderPosts();
+        }
+
+        // دالة تسجيل الخروج ومسح الحساب المحفوظ من الذاكرة المحلية
+        function logOutUser() {
+            localStorage.removeItem('vira_saved_session');
+            document.getElementById('userIdentityField').value = "";
+            document.getElementById('userPasswordField').value = "";
+            document.getElementById('rememberMeCheckbox').checked = false;
+            
+            document.getElementById('mainWorkspaceArea').style.display = 'none';
+            document.getElementById('loginScreenView').style.display = 'flex';
+            triggerToast("Logged out successfully.");
+        }
+
+        function generateMediaMarkup(url) {
+            if (!url) return '';
+            url = url.trim();
+            if (url.includes('youtube.com/watch?v=') || url.includes('youtu.be/')) {
+                let videoId = url.includes('youtu.be/') ? url.split('youtu.be/')[1].split('?')[0] : url.split('v=')[1].split('&')[0];
+                return `<div class="post-media-container"><iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe></div>`;
+            }
+            if (url.match(/\.(mp4|webm|ogg)$/i) || url.includes('stream')) {
+                return `<div class="post-media-container"><video src="${url}" controls preload="metadata"></video></div>`;
+            }
+            return `<div class="post-media-container"><img src="${url}" alt="Media Content"></div>`;
+        }
+
+        function updateLivePreview() {
+            let text = document.getElementById('inputPostText').value.trim();
+            let media = document.getElementById('inputPostMedia').value.trim();
+            document.getElementById('previewTextOutput').innerText = text ? text : "[Empty Broadcast Text]";
+            document.getElementById('previewMediaOutput').innerHTML = media ? generateMediaMarkup(media) : "";
+        }
+
+        function renderPosts() {
+            let feed = document.getElementById('feedInjectContainer');
+            feed.innerHTML = '';
+
+            if(postsData.length === 0) {
+                feed.innerHTML = `<div class="empty-placeholder"><i class="fa-solid fa-chart-pie" style="font-size: 44px; display: block; margin-bottom: 15px;"></i>No broadcasts streaming on the grid yet.</div>`;
+                return;
+            }
+
+            postsData.forEach((post, index) => {
+                let deleteBtnHtml = isFounder ? `<button class="delete-btn" onclick="deletePost(${index})"><i class="fa-solid fa-trash-can"></i></button>` : '';
+                let mediaHtml = post.media ? generateMediaMarkup(post.media) : '';
+                
+                let commentsHtml = '';
+                post.comments.forEach((comment, cIndex) => {
+                    let isOwnerOrFounder = (comment.user === currentUser || isFounder);
+                    let deleteCommentBtn = isOwnerOrFounder ? `<i class="fa-solid fa-xmark comment-delete-trigger" onclick="deleteComment(${index}, ${cIndex})"></i>` : '';
+                    commentsHtml += `<div class="single-comment"><div><div class="c-user">@${comment.user}</div><div>${comment.text}</div></div>${deleteCommentBtn}</div>`;
+                });
+
+                let postMarkup = `
+                    <div class="premium-blog-card">
+                        ${deleteBtnHtml}
+                        <div class="blog-user-row">
+                            <div class="founder-avatar">V</div>
+                            <div class="blog-user-meta">
+                                <div class="b-name">vira corporation <i class="fa-solid fa-circle-check" style="color: #0078d4;"></i></div>
+                                <div class="b-tag">Main channel</div>
+                            </div>
+                        </div>
+                        <div class="blog-text">${post.text}</div>
+                        ${mediaHtml}
+                        <div class="blog-footer-actions">
+                            <button class="interactive-action-btn ${post.liked ? 'post-liked' : ''}" onclick="toggleLike(${index})"><i class="fa-solid fa-thumbs-up"></i></button>
+                            <button class="interactive-action-btn ${post.disliked ? 'post-disliked' : ''}" onclick="toggleDislike(${index})"><i class="fa-solid fa-thumbs-down"></i></button>
+                        </div>
+                        <div class="comments-section">
+                            <div class="comment-input-box">
+                                <input type="text" id="comment-input-${index}" placeholder="Add to the discussion...">
+                                <button onclick="addCommentToPost(${index})"><i class="fa-solid fa-paper-plane" style="color: rgb(116, 192, 252);"></i> Send</button>
+                            </div>
+                            <div class="comments-list">${commentsHtml}</div>
+                        </div>
+                    </div>`;
+                feed.insertAdjacentHTML('beforeend', postMarkup);
+            });
+        }
+
+        function publishNewPostToFeed() {
+            let text = document.getElementById('inputPostText').value.trim();
+            let media = document.getElementById('inputPostMedia').value.trim();
+            if (text === "" && media === "") return;
+
+            postsData.unshift({ text: text, media: media, liked: false, disliked: false, comments: [] });
+            localStorage.setItem('vira_corporate_posts', JSON.stringify(postsData));
+            renderPosts();
+
+            document.getElementById('inputPostText').value = "";
+            document.getElementById('inputPostMedia').value = "";
+            updateLivePreview();
+            triggerToast("Broadcast established securely.");
+        }
+
+        function deletePost(index) {
+            postsData.splice(index, 1);
+            localStorage.setItem('vira_corporate_posts', JSON.stringify(postsData));
+            renderPosts();
+            triggerToast("Post wiped from databank.");
+        }
+
+        function toggleLike(index) {
+            postsData[index].liked = !postsData[index].liked;
+            if(postsData[index].liked) postsData[index].disliked = false; 
+            localStorage.setItem('vira_corporate_posts', JSON.stringify(postsData));
+            renderPosts();
+        }
+
+        function toggleDislike(index) {
+            postsData[index].disliked = !postsData[index].disliked;
+            if(postsData[index].disliked) postsData[index].liked = false; 
+            localStorage.setItem('vira_corporate_posts', JSON.stringify(postsData));
+            renderPosts();
+        }
+
+        function addCommentToPost(index) {
+            let inputField = document.getElementById(`comment-input-${index}`);
+            let commentText = inputField.value.trim();
+            if (commentText === "") return;
+
+            postsData[index].comments.push({ user: currentUser, text: commentText });
+            localStorage.setItem('vira_corporate_posts', JSON.stringify(postsData));
+            renderPosts();
+            inputField.value = "";
+        }
+
+        function deleteComment(postIndex, commentIndex) {
+            postsData[postIndex].comments.splice(commentIndex, 1);
+            localStorage.setItem('vira_corporate_posts', JSON.stringify(postsData));
+            renderPosts();
+            triggerToast("Comment detached.");
+        }
+
+        function triggerToast(message) {
+            let toast = document.getElementById('globalToastNotification');
+            document.getElementById('toastMessageText').innerText = message;
+            toast.classList.add('show-toast');
+            setTimeout(() => { toast.classList.remove('show-toast'); }, 2500);
+        }
+        
+    </script>
+    
+</body>
+</html>
